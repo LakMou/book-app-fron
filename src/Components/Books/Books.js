@@ -1,0 +1,126 @@
+// import React, { useEffect } from 'react'
+// import "./Books.css"
+// import BookCard from '../BookCard/BookCard'
+// import AddBook from '../AddBook/AddBook';
+// import image from "../../assets/books.jpg"
+// import {useDispatch , useSelector} from "react-redux"
+// import axios from "axios"
+
+// const Books = ({styles})=>{
+    
+//     const dispatch =useDispatch()
+//     const {books} = useSelector(state =>state.book)
+
+//     useEffect(()=>{
+//       const fetchData = async () =>{
+
+//         try{
+//           const response = await axios.get("http://localhost:4000/books")
+//           console.log("RESPONSE: ",response)
+//           if(!response || response.status !==200){
+//               return dispatch ({type:"SET_BOOKS", payload :[]})
+//                                               }
+          
+//           return dispatch({type: "SET_BOOKS", payload:response.data.data})
+//       }
+//       catch(err){
+//           console.log(err)
+//           return dispatch({type :"SET_BOOKS", payload :[]})
+
+//       }
+//       }
+//       fetchData()}, [dispatch])
+
+//         return(
+//             <div style={{...styles}}>
+//             <div className="add-book-container">
+//                 <AddBook/>
+//             </div>
+//             <div className="books-container">
+//               {!books || books.length === 0 ? (
+//                 <div>No Data To Display</div>
+//               ):(
+//                 <>
+//                 {books.map((book , key)=>(
+//                     <BookCard 
+//                     key={key}
+//                     title={book.title}
+//                     author={book.author}
+//                     rating={book.rating}
+//                     voters={book.voters}
+//                     description={book.description}
+//                     image={book.image}/>
+                
+//                     ) )}
+//                     </>
+//               )}
+//             </div>
+//             </div>
+//         )
+
+
+// }
+// export default Books
+
+import React, { useEffect } from "react";
+import "./Books.css";
+import BookCard from "../BookCard/BookCard";
+import AddBook from "../AddBook/AddBook";
+import { useSelector, useDispatch } from "react-redux";
+import axios from "axios";
+const Books = ({ styles }) => {
+  const dispatch = useDispatch();
+  const { books } = useSelector((state) => state.book);
+  const { title, author } = useSelector((state) => state.filter);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get("http://localhost:4000/books");
+        console.log("response is: ", response.data.data)
+        if (!response || response.status !== 200)
+          return dispatch({ type: "SET_BOOKS", payload: [] });
+        return dispatch({ type: "SET_BOOKS", payload: response.data.data });
+      } catch (err) {
+        console.log(err.message);
+        dispatch({ type: "SET_BOOKS", payload: [] });
+      }
+    };
+    fetchData();
+  }, [dispatch]);
+  return (
+    <div style={{ ...styles }}>
+      <div className="add-book-container">
+        <AddBook />
+      </div>
+      <div className="books-container">
+        {!books || books.length === 0 ? (
+          <div>No Data To Display</div>
+        ) : (
+          <>
+            {books
+              .filter(
+                (elem) =>
+                  elem.title.toLowerCase().indexOf(title.toLowerCase()) !== -1
+              )
+              .filter(
+                (elem) =>
+                  elem.author.toLowerCase().indexOf(author.toLowerCase()) !== -1
+              )
+              .map((book, index) => (
+                <BookCard
+                  key={index}
+                  title={book.title}
+                  author={book.author}
+                  rating={book.rating}
+                  voters={book.nbVoters}
+                  description={book.description}
+                  img={book.img}
+                />
+              ))}
+          </>
+        )}
+      </div>
+    </div>
+  );
+};
+export default Books;
